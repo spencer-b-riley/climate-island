@@ -77,20 +77,45 @@ const Scene = (() => {
   };
   const morph = (fn, poses, seq, dur, times) => `<animate attributeName="d" dur="${dur}s" repeatCount="indefinite" calcMode="spline"
       values="${seq.map((k) => fn(...poses[k])).join(';')}" keyTimes="${times}" keySplines="${seq.slice(1).map(() => '.45 0 .55 1').join(';')}"/>`;
-  // seagull wing poses: [wrist, tip]
-  const GULL_NEAR = { up: [[-5, -14], [-16, -27]], mid: [[-10, -7], [-30, -6]], down: [[-7, 3], [-17, 15]] };
-  const GULL_FAR = { up: [[-3, -14], [-12, -25]], mid: [[-8, -8], [-25, -8]], down: [[-5, 1], [-13, 11]] };
-  const GULL_SEQ = ['mid', 'up', 'down', 'up', 'down', 'mid', 'mid'], GULL_T = '0;.09;.2;.31;.42;.55;1';
-  const gullWing = (poses, fill, tipFill, stroke) => `<path d="${wingD(...poses.mid)}" fill="${fill}"${stroke ? ` stroke="${stroke}" stroke-width=".7"` : ''}>${morph(wingD, poses, GULL_SEQ, 2.4, GULL_T)}</path>
-      <path d="${tipD(...poses.mid)}" fill="${tipFill}">${morph(tipD, poses, GULL_SEQ, 2.4, GULL_T)}</path>`;
-  const gull = `<g class="gull">
-      ${gullWing(GULL_FAR, '#b9c2ca', '#3a3f47')}
+  /* Seagull wing poses: [wrist, tip]. A real wingbeat: a strong downstroke with the wing spread wide ('up' → 'down'),
+     then a quick upstroke with the wing bent in at the wrist ('fold') so it slips back up. 'glide' = wings out, still. */
+  const GULL_NEAR = { up: [[-6, -13], [-17, -27]], down: [[-7, 4], [-16, 17]], fold: [[-5, -9], [-23, -8]], glide: [[-10, -7], [-30, -6]] };
+  const GULL_FAR = { up: [[-4, -13], [-13, -25]], down: [[-5, 2], [-12, 13]], fold: [[-3, -9], [-19, -9]], glide: [[-8, -8], [-25, -8]] };
+  /* One flight pattern, like real gulls: a burst of wingbeats, then a long glide. The body rises a little on every
+     downstroke (that's the wing pushing air down) and sinks slowly while gliding, nose up while flapping, a bit
+     down while gliding. Every gull gets its own number of beats, speed and glide, so they never flap in step. */
+  function gullPlan(flaps, period, glide) {
+    const steps = [];   // [wing pose, time, body y, body tilt]
+    let t = 0, y = 2.4;
+    steps.push(['glide', 0, y, 3]);
+    t += 0.2; steps.push(['up', t, y + 0.3, -2]);
+    for (let n = 0; n < flaps; n++) {
+      t += period * 0.55; y -= 1.5; steps.push(['down', t, y, -4]);
+      t += period * 0.25; y += 0.5; steps.push(['fold', t, y, -3]);
+      t += period * 0.2; y += 0.15; steps.push(['up', t, y, -2]);
+    }
+    t += 0.24; steps.push(['glide', t, y, 0]);
+    t += glide; steps.push(['glide', t, 2.4, 3]);
+    return { steps, dur: t };
+  }
+  const SPLINE = '.42 0 .58 1';
+  const planAnim = (plan, attr, fmt, begin, extra = '') => {
+    const { steps, dur } = plan;
+    return `<animate${attr === 'd' ? '' : 'Transform'} attributeName="${attr === 'd' ? 'd' : 'transform'}"${extra} begin="${begin}s" dur="${dur.toFixed(2)}s" repeatCount="indefinite" calcMode="spline"
+      values="${steps.map(fmt).join(';')}" keyTimes="${steps.map((st) => +(st[1] / dur).toFixed(4)).join(';')}" keySplines="${steps.slice(1).map(() => SPLINE).join(';')}"/>`;
+  };
+  const gullWing = (poses, fill, tipFill, stroke, plan, begin) => `<path d="${wingD(...poses.glide)}" fill="${fill}"${stroke ? ` stroke="${stroke}" stroke-width=".7"` : ''}>${planAnim(plan, 'd', (st) => wingD(...poses[st[0]]), begin)}</path>
+      <path d="${tipD(...poses.glide)}" fill="${tipFill}">${planAnim(plan, 'd', (st) => tipD(...poses[st[0]]), begin)}</path>`;
+  const gull = (plan, begin) => `<g class="gull"><g>
+      ${planAnim(plan, 'translate', (st) => `0 ${st[2].toFixed(2)}`, begin, ' type="translate"')}${planAnim(plan, 'rotate', (st) => st[3], begin, ' type="rotate" additive="sum"')}
+      ${gullWing(GULL_FAR, '#b9c2ca', '#3a3f47', null, plan, begin)}
       <path d="M-15 1 C-11 -3 2 -4.5 9 -2 C13 -0.5 14 1.5 11 2.6 C3 4.8 -8 4.2 -15 2.6 L-21 2Z" fill="#fff"/><path d="M-15 1.4 L-21 2 L-15 2.8Z" fill="#9aa3ad"/>
       <circle cx="10" cy="-2" r="3.4" fill="#fff"/><path d="M13 -2.4 L18.5 -1.2 L13 0Z" fill="#f2c94c"/><circle cx="17" cy="-1" r=".7" fill="#e63946"/><circle cx="11" cy="-2.8" r=".8" fill="#23313f"/>
-      ${gullWing(GULL_NEAR, '#eef1f4', '#2b2f36', '#9aa3ad')}</g>`;
-  // (alt = how far up and down the bird drifts while it flies, and how slowly: so they don't all fly on one line)
-  const gullFlight = (k, y, sc, dur, delay, left = false, alt = [24, 9]) =>
-    `<g data-k="birds${k}" class="fade"><g class="fly${left ? ' left' : ''}" style="animation-duration:${dur}s;animation-delay:${delay}s"><g class="alt" style="--alt:${alt[0]}px;animation-duration:${alt[1]}s;animation-delay:${-alt[1] * 0.4}s"><g transform="translate(0 ${y}) scale(${left ? -sc : sc} ${sc})"><g class="soar">${gull.replace(/<animate /g, `<animate begin="${delay}s" `)}</g></g></g></g></g>`;
+      ${gullWing(GULL_NEAR, '#eef1f4', '#2b2f36', '#9aa3ad', plan, begin)}</g></g>`;
+  // (alt = how far up and down the bird drifts while it flies, and how slowly: so they don't all fly on one line;
+  //  plan = [wingbeats in a burst, seconds per beat, seconds of gliding])
+  const gullFlight = (k, y, sc, dur, delay, left = false, alt = [24, 9], plan = [4, 0.42, 1.6]) =>
+    `<g data-k="birds${k}" class="fade"><g class="fly${left ? ' left' : ''}" style="animation-duration:${dur}s;animation-delay:${delay}s"><g class="alt" style="--alt:${alt[0]}px;animation-duration:${alt[1]}s;animation-delay:${-alt[1] * 0.4}s"><g transform="translate(0 ${y}) scale(${left ? -sc : sc} ${sc})">${gull(gullPlan(...plan), delay)}</g></g></g></g>`;
   // an airliner, far away and high up (with a white trail); it only comes by now and then
   const PLANE = `<path d="M-34 -1 H-190" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".45"/>
       <path d="M-30 0 Q-30 -5 -24 -5 H22 Q30 -5 34 0 Q30 4 22 4 H-24 Q-30 4 -30 0Z" fill="#f4f6f8" stroke="#c8cdd3" stroke-width="1"/>
@@ -187,7 +212,8 @@ const Scene = (() => {
   const HAWK_WING = 'M0 0 C-6 -6 -18 -9 -30 -8 L-33 -11 L-32.5 -7.5 L-36.5 -8.5 L-34.5 -5.5 L-38.5 -5 L-34.5 -2.6 L-37.5 -1 L-31 .4 C-22 3 -10 4.2 0 3Z';
   const HAWK_T = '0;.1;.22;.34;.46;.6;1';   // (two slow flaps, then a long glide)
   const tilt = (vals) => `<animateTransform attributeName="transform" type="rotate" dur="6s" repeatCount="indefinite" calcMode="spline" values="${vals}" keyTimes="${HAWK_T}" keySplines="${Array(6).fill('.45 0 .55 1').join(';')}"/>`;
-  const HAWK = `<g class="hawk-side">
+  const HAWK = `<g class="hawk-side"><animateTransform attributeName="transform" type="translate" dur="6s" repeatCount="indefinite" calcMode="spline"
+      values="0 2;0 2.6;0 0.6;0 1.3;0 -0.6;0 -0.3;0 2" keyTimes="${HAWK_T}" keySplines="${Array(6).fill('.45 0 .55 1').join(';')}"/>
       <g transform="translate(1 -3)"><g>${tilt('34;50;16;46;18;34;34')}<path d="${HAWK_WING}" fill="#5a3a1e" transform="scale(.82 .7)"/></g></g>
       <path d="M-16 1 L-29 -2.5 L-30 2 L-28 6 L-16 3.5Z" fill="#a0673a"/><path d="M-27 -1.5 L-27.5 4.5 M-23 -0.5 L-23.5 4.5" stroke="#5a3a1e" stroke-width="1.2"/>
       <path d="M-17 1 C-11 -4.5 4 -6 12 -3.5 C16 -2 18 0.5 15.5 2.5 C8 5.5 -6 5 -16 3.5Z" fill="#7a4e2a"/>
@@ -457,6 +483,7 @@ const Scene = (() => {
     return `
 <svg class="scene-main" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Bobo's City" xmlns="http://www.w3.org/2000/svg">
   <defs>
+    <linearGradient id="${u}flood" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3aa7d8"/><stop offset=".25" stop-color="#1f7fbf"/><stop offset="1" stop-color="#0c3f72"/></linearGradient>
     <clipPath id="${u}beachClip"><rect x="-200" y="486" width="1200" height="200"/></clipPath>
     <pattern id="${u}tufts" width="26" height="17" patternUnits="userSpaceOnUse"><path d="M3 13 l1.4 -4 l1.4 4 M7 13 l.8 -3 M15 6 l1.2 -3.6 l1.2 3.6 M21 15 l1 -3 l1 3 M11 16 l.7 -2.5" stroke="#2e6b2a" stroke-width=".9" fill="none" opacity=".5"/></pattern>
     <linearGradient id="${u}sea" gradientUnits="userSpaceOnUse" x1="0" y1="285" x2="0" y2="900"><stop offset="0" class="st-sea-top"/><stop offset=".35" class="st-sea-bot"/><stop offset="1" class="st-sea-deep"/></linearGradient>
@@ -467,9 +494,9 @@ const Scene = (() => {
   <!-- airplanes now and then, high up (far away, so they're small) -->
   <g class="plane" style="animation-duration:150s;animation-delay:-120s"><g transform="translate(0 112) scale(.32)">${PLANE}</g></g>
   <g class="plane left" style="animation-duration:210s;animation-delay:-40s"><g transform="translate(0 138) scale(-.22 .22)">${PLANE}</g></g>
-  ${gullFlight(1, 128, 0.5, 30, -4, false, [30, 11])}${gullFlight(2, 228, 0.28, 40, -20, true, [18, 8])}${gullFlight(3, 540, 0.6, 26, -11, false, [14, 6])}
+  ${gullFlight(1, 128, 0.5, 30, -4, false, [16, 13], [4, 0.42, 1.7])}${gullFlight(2, 228, 0.28, 40, -20, true, [10, 11], [3, 0.36, 2.3])}${gullFlight(3, 540, 0.6, 26, -11, false, [8, 9], [5, 0.46, 1.2])}
   <!-- one hawk circling high above the city -->
-  <g data-k="hawk" class="fade"><g class="hawk-fly"><g class="alt" style="--alt:40px;animation-duration:17s"><g transform="translate(0 165) scale(-0.55 0.55)"><g class="soar">${HAWK}</g></g></g></g></g>
+  <g data-k="hawk" class="fade"><g class="hawk-fly"><g class="alt" style="--alt:40px;animation-duration:17s"><g transform="translate(0 165) scale(-0.55 0.55)">${HAWK}</g></g></g></g>
 
   <g class="ripples" fill="none" stroke="#ffffff" stroke-width="1.4">${[[120, 560, 0], [300, 590, -1.6], [470, 556, -3.1], [610, 600, -0.8], [760, 566, -2.3], [-30, 420, -1.2], [835, 380, -2.7], [40, 640, -3.6], [540, 646, -0.4], [230, 630, -2.9]]
     .map(([x, y, d]) => `<ellipse class="ripple" cx="${x}" cy="${y}" rx="12" ry="3.2" style="animation-delay:${d}s"/>`).join('')}</g>
@@ -515,6 +542,11 @@ const Scene = (() => {
     ${[0, 1, 2, 3, 4, 5].map((r) => `<rect class="win${(r * 3 + 16) % 5 < 2 ? ' unlit' : ''}" x="448" y="${232 + r * 13}" width="9" height="7"/><rect class="win${(r * 3 + 18) % 5 < 2 ? ' unlit' : ''}" x="462" y="${232 + r * 13}" width="9" height="7"/>`).join('')}
     ${item('solarTowers', 0, 0, `<g transform="translate(334 132) scale(.5)">${solar(14, 6)}</g><g transform="translate(392 164)">${solar(9, 4)}</g>`, 'fade')}
   </g>
+  <!-- the railway (behind the power plant and the power line: they stand closer to us) -->
+  <rect x="-800" y="316" width="2600" height="6" fill="#8b7a68"/><path d="M-800 316 H1800" stroke="#4a5563" stroke-width="2"/>
+  <g data-k="trains"><g class="trainrun" style="animation-duration:26s;animation-delay:-6s"><g transform="translate(0 316) scale(.95)" class="train">${TRAIN}</g></g>
+    <g data-k="train2" class="fade hide"><g class="trainrun back" style="animation-duration:26s;animation-delay:-19s"><g transform="translate(0 316) scale(-.95 .95)" class="train">${TRAIN}</g></g></g></g>
+  <g data-k="trainFx"></g>
   <!-- energy: electricity flows from the power plant to the city along the wire -->
   <g class="powerline"><path d="M490 262 V318 M560 262 V318 M626 262 V318" stroke="#6b5a4a" stroke-width="3"/><path d="M484 262 H632 M484 262 L490 256 L496 262" stroke="#6b5a4a" stroke-width="2" fill="none"/>
     <path d="M478 266 Q522 274 560 266 Q596 274 652 270" stroke="#3a3f47" stroke-width="1.6" fill="none"/>
@@ -533,11 +565,6 @@ const Scene = (() => {
     <path d="M668 288 l6 -9 l-2 6 h6 l-7 10 l2 -7Z" fill="#ffd23f"/>
   </g>
 
-  <!-- the railway -->
-  <rect x="-800" y="316" width="2600" height="6" fill="#8b7a68"/><path d="M-800 316 H1800" stroke="#4a5563" stroke-width="2"/>
-  <g data-k="trains"><g class="trainrun" style="animation-duration:26s;animation-delay:-6s"><g transform="translate(0 316) scale(.95)" class="train">${TRAIN}</g></g>
-    <g data-k="train2" class="fade hide"><g class="trainrun back" style="animation-duration:26s;animation-delay:-19s"><g transform="translate(0 316) scale(-.95 .95)" class="train">${TRAIN}</g></g></g></g>
-  <g data-k="trainFx"></g>
   <g class="station closed">
     <rect x="188" y="321" width="90" height="9" fill="#c9c2b0"/><path d="M188 321 H278" stroke="#fff" stroke-width="2" opacity=".6"/>
     <path d="M196 321 V292 M270 321 V292" stroke="#6b5a4a" stroke-width="3"/><path d="M182 292 H284 L278 284 H188Z" fill="#e63946"/>
@@ -836,6 +863,28 @@ const Scene = (() => {
   <g data-k="fx"></g>
 
   <g data-k="frontLayer"></g>
+  <!-- the flood (one of the two "island overheated" endings): the sea rises over the whole city, only the towers stay -->
+  <g data-k="flood" class="flood hide">
+    <g class="flood-rise">
+      <path d="M-400 302 H1200 V1000 H-400Z" fill="url(#${u}flood)"/>
+      <g class="surge"><g class="surge-roll">
+        <path d="M-480 302 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 V302 H-480Z" fill="#2b93cc"/>
+        <path d="M-480 302 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 c 20 -26 60 -26 80 0 " fill="none" stroke="#eaf8ff" stroke-width="5" stroke-linecap="round"/>
+        ${[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20].map((k) => `<circle cx="${-440 + k * 80}" cy="281" r="3.2" fill="#fff" opacity=".85"/><circle cx="${-432 + k * 80}" cy="276" r="2" fill="#fff" opacity=".7"/>`).join('')}
+      </g></g>
+      <g class="ripples-flood"><path d="M-400 318 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 " fill="none" stroke="#bfe6fa" stroke-width="1.6" opacity=".55"/>
+        <path d="M-380 340 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 q 20 -7 40 0 " fill="none" stroke="#bfe6fa" stroke-width="1.4" opacity=".35"/></g>
+    </g>
+    <!-- what's left floats around: bits of roof, planks, a crate, a ball, a car, a tree -->
+    <g class="debris">
+      <g transform="translate(150 306)"><g class="bob-float"><path d="M-16 2 L0 -10 L16 2Z" fill="#ff8c42" stroke="#c96a2b" stroke-width="1.5" transform="rotate(-8)"/></g></g>
+      <g transform="translate(250 309)"><g class="bob-float" style="animation-delay:-1.1s"><rect x="-15" y="-3" width="30" height="5" rx="1.5" fill="#9b6a3c" transform="rotate(6)"/></g></g>
+      <g transform="translate(520 307)"><g class="bob-float" style="animation-delay:-2s"><rect x="-6" y="-9" width="12" height="11" rx="1" fill="#c98f4f" stroke="#8b5a2b" stroke-width="1.2"/><path d="M-6 -9 L6 2 M6 -9 L-6 2" stroke="#8b5a2b" stroke-width="1"/></g></g>
+      <g transform="translate(600 305)"><g class="bob-float" style="animation-delay:-.6s"><circle r="5.5" fill="#fff"/><path d="M0 -5.5 A5.5 5.5 0 0 1 5.5 0 H0Z M0 5.5 A5.5 5.5 0 0 1 -5.5 0 H0Z" fill="#ff5b4a"/><path d="M5.5 0 A5.5 5.5 0 0 1 0 5.5 V0Z" fill="#2f80ed"/></g></g>
+      <g transform="translate(690 308)"><g class="bob-float" style="animation-delay:-1.6s"><g transform="rotate(-10) scale(.5)"><path d="M-30 0 V-12 Q-28 -18 -18 -18 L-10 -28 H14 L24 -18 Q32 -16 32 -8 V0Z" fill="#e63946"/><path d="M-6 -25 H10 L18 -18 H-12Z" fill="#cfefff"/><circle cx="-16" cy="1" r="6" fill="#2b2f36"/><circle cx="18" cy="1" r="6" fill="#2b2f36"/></g></g></g>
+      <g transform="translate(80 308)"><g class="bob-float" style="animation-delay:-2.4s"><g transform="rotate(70) scale(.5)"><path d="M-4 0 L-3 -30 L3 -30 L4 0Z" fill="#9b6a3c"/><circle cx="0" cy="-44" r="18" fill="#3fa34d"/><circle cx="-13" cy="-33" r="12" fill="#2e8a3e"/><circle cx="13" cy="-34" r="13" fill="#2e8a3e"/></g></g></g>
+    </g>
+  </g>
   <g data-k="fxTop"></g>
   </g>
 </svg>`;
@@ -1391,6 +1440,7 @@ const Scene = (() => {
     const pans = container.querySelectorAll('.bd-pan');
     let vb = [0, 0, 800, 500], camFocus = 400, camFocusY = 454, follow = false;
     let camLeft = 0, camTop = 0, camKey = '', zoomSize = '';
+    let closeUp = false;   // (the flood ending: closer in on the tower roofs, on wide screens)
     const CAM_BOX = [-300, -60, 1400, 700];   // (all the camera can ever see, with room to spare)
     function slide(tx, ty, ms) {
       const key = `${tx} ${ty}`;
@@ -1422,6 +1472,7 @@ const Scene = (() => {
       // close up on phones; on wide screens (computers, tablets sideways) a little further out;
       // on the title screen further out still, under the logo
       VIEW_H = container.classList.contains('title-scene') ? 380 : r.width > r.height ? 350 : 290;
+      if (closeUp) VIEW_H = Math.min(VIEW_H, Math.max(VIEW_H * 0.62, 230 * r.height / r.width));   // (but always all four towers)
       const W = Math.min(800, VIEW_H * r.width / r.height), top = clamp(camFocusY - VIEW_H * 0.76, 90, 590 - VIEW_H);
       const want = follow ? [(800 - W) / 2, top, W, VIEW_H] : [0, 0, 800, 500];
       const size = `${r.width}x${r.height}`;
@@ -1448,7 +1499,7 @@ const Scene = (() => {
     /* Little animations the camera can't see (bees, smoke, ripples… on the other side of the island) are paused,
        so the phone only works on what's on screen; they start again as soon as the camera gets near.
        Things that travel across the whole city (trains, planes, birds, fish, the far cars) always keep going. */
-    const TRAVELS = /^(train|trainBack|plane|planeLeft|fly|flyLeft|swim|drift|driveR|toSchool)$/;
+    const TRAVELS = /^(train|trainBack|plane|planeLeft|fly|flyLeft|swim|drift|driveR|toSchool|swept)$/;
     let cullTimer = 0;
     function cullAnims() {
       clearTimeout(cullTimer);
@@ -1521,6 +1572,10 @@ const Scene = (() => {
       return back(from) ? [[P.gapB[0], P.gapB[1]], [P.gapF[0], P.gapF[1]], to] : [[P.gapF[0], P.gapF[1]], [P.gapB[0], P.gapB[1]], to];
     }
     function place([x, y]) {
+      placeQuiet([x, y]);
+      camTo(x, 0, y);
+    }
+    function placeQuiet([x, y]) {
       walkPos = [x, y];
       const layer = layerFor(y);
       if (wrap.parentNode !== layer) layer.appendChild(wrap);
@@ -1528,7 +1583,6 @@ const Scene = (() => {
       walker.style.transform = `translate(${x - 400}px, ${y - 400}px) scale(${depthK(y).toFixed(3)})`;
       void walker.getBoundingClientRect();
       walker.style.transitionDuration = '';
-      camTo(x, 0, y);
     }
 
     const WEAR = { pack: ['mPack', 'mStraps'], bike: ['mRide'], hat: ['mHat'], sweater: ['mSweater'], cool: ['mJacketCool'], plain: ['mJacketPlain'],
@@ -2423,6 +2477,47 @@ const Scene = (() => {
             await s.w(900 + (k % 3) * 400);
           }
         })().catch(() => {});
+      },
+      /* The flood ending: Bobo shouts a warning, everybody gets up on the flat roofs of the towers (Bobo and his family on
+         the orange one, the friends and neighbors on the two next to it), then a giant wave rises over the whole city.
+         Everything that sticks out (school, shops, power plant, wind turbines, trees, trains) is washed away; only the
+         towers are left, and bits of the city float on the water. */
+      async flood(warn, safe) {
+        begin();
+        const g = gen;
+        const still = () => g === gen;
+        s.jump(); react('scared', 0);
+        say(warn, 2400);
+        await sleep(1900); if (!still()) return;
+        s.inside(true);
+        await sleep(450); if (!still()) return;
+        // up on the roofs
+        placeQuiet([420, 172]);
+        const fam = s.family([[395, 172], [407, 172], [431, 172]]);
+        const roofs = [['golden', '#ffd23f', [294, 190]], ['red', '#2fb35a', [306, 190]], ['grey', '#ff8c42', [318, 190]], ['tan', '#7d5fff', [451, 222]], ['dark', '#1fa7a0', [466, 222]]];
+        const friends = roofs.map(([kind, shirt, at]) => s.buddy(kind, shirt, at));
+        [...fam, ...friends].forEach((m) => { m.keep = true; m.appear(); });
+        s.inside(false);
+        // (a cut, like in a film: closer in on the roofs)
+        camTo(413, 0, 262);   // (roofs a bit below the top, so Bobo's speech bubble fits above them)
+        closeUp = true; zoomSize = ''; applyZoom();
+        await sleep(1900); if (!still()) return;
+        // the wave
+        const fl = q('flood');
+        fl.classList.remove('hide');
+        void fl.getBoundingClientRect();
+        fl.classList.add('rising');
+        sfx('storm');
+        await sleep(1500); if (!still()) return;
+        sfx('splash');
+        svg.classList.add('flooded');   // (style.css: everything that sticks out is swept away)
+        await sleep(2300); if (!still()) return;
+        fl.classList.add('calm');
+        sfx('splash');
+        await sleep(1200); if (!still()) return;
+        react('sad', 0);
+        say(safe, 4000);
+        await sleep(1500);
       },
       // where Bobo is on the screen (the middle of him) and how tall he looks, in pixels
       // (worked out from where he stands in the city: the browser's box for a scaled figure can be a bit off)

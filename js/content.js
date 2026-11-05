@@ -28,6 +28,7 @@ const ENDINGS = {
   warming: { icon: 'thermo' },  // up to +2.0 °C
   hot:     { icon: 'hot' },     // above that
   overheated: { icon: 'hot' },  // +2.5 °C or more: game over (can happen before the last choice)
+  flooded: { icon: 'splash' },  // the other way to lose at +2.5 °C: a giant storm wave floods the city (half the games)
 };
 
 const ACHIEVEMENTS = [

@@ -71,7 +71,7 @@ const I18N = {
     say: {
       idle: ['Hey you! Are you still there?', 'Can you help me choose?', 'Psst… which one is better for our city?', 'Help me keep the city cool!', 'I need your help!', 'Which choice helps our planet?', 'Hello? Anybody there?', 'Let’s make a choice that’s good for Earth!'],
       letsGo: 'Let’s go!', schoolOut: 'School’s out!', thanksMom: 'Thanks, Mom!', thanksDad: 'Thanks, Dad!', thanksBanjo: 'Thanks for helping, Banjo!',
-      hello: 'Hi! I’m Bobo!', eclipse: 'Eclipse glasses on!', eclipseWow: 'Whoa! It’s getting dark!', lessonTime: 'Let’s see what we learned!', whale: 'A whale! Hi there!', heat: 'Phew… so hot and dry!', storm: 'What a storm!', bugs: 'Ugh, bugs!', warrior: 'We did it!',
+      hello: 'Hi! I’m Bobo!', eclipse: 'Eclipse glasses on!', eclipseWow: 'Whoa! It’s getting dark!', floodWarn: 'A giant wave! Everyone up the towers!', floodSafe: 'Phew… we’re all safe!', lessonTime: 'Let’s see what we learned!', whale: 'A whale! Hi there!', heat: 'Phew… so hot and dry!', storm: 'What a storm!', bugs: 'Ugh, bugs!', warrior: 'We did it!',
       choices: [
         ['Time for school!', 'Wheee! Fastest way!', 'Off we go… vroom.', 'A bike group!'],
         ['TV time is over.', 'Click! All off!', 'Nobody’s watching…', 'Solar panels!'],
@@ -106,6 +106,7 @@ const I18N = {
       warming: ['Warming Island', 'The city warmed up to +{n} °C. Summers are hotter and fewer animals are around. Some green choices helped. Try again to cool it down!'],
       hot: ['Hot Island', 'The city heated up to +{n} °C. It is dry and stormy, there are bugs everywhere and the animals left. Small choices add up. Try again and see the difference!'],
       overheated: ['Island Overheated!', 'Oh no! The city got too hot (+{n} °C). It is dry and stormy, and the animals left. Every green choice keeps the island cooler. Try again!'],
+      flooded: ['Island Flooded!', 'Oh no! The city got too hot (+{n} °C). The warm sea rose, and a giant storm wave washed the city away! Bobo, his family and the neighbors are safe on top of the towers. Every green choice keeps the island cooler. Try again!'],
     },
     ach: {
       first: ['First Steps', 'Finish your first game'],
@@ -341,7 +342,7 @@ const I18N = {
     say: {
       idle: ['Hey du! Bist du noch da?', 'Kannst du mir beim Entscheiden helfen?', 'Psst… was ist besser für unsere Stadt?', 'Hilf mir, die Stadt kühl zu halten!', 'Ich brauche deine Hilfe!', 'Was hilft unserem Planeten?', 'Hallo? Ist da jemand?', 'Lass uns etwas Gutes für die Erde wählen!'],
       letsGo: 'Los geht’s!', schoolOut: 'Schule ist aus!', thanksMom: 'Danke, Mama!', thanksDad: 'Danke, Papa!', thanksBanjo: 'Danke fürs Helfen, Banjo!',
-      hello: 'Hallo! Ich bin Bobo!', eclipse: 'Finsternis-Brille auf!', eclipseWow: 'Wow! Es wird dunkel!', lessonTime: 'Mal sehen, was wir gelernt haben!', whale: 'Ein Wal! Hallo!', heat: 'Puh… so heiss und trocken!', storm: 'Was für ein Sturm!', bugs: 'Igitt, Insekten!', warrior: 'Geschafft!',
+      hello: 'Hallo! Ich bin Bobo!', eclipse: 'Finsternis-Brille auf!', eclipseWow: 'Wow! Es wird dunkel!', floodWarn: 'Eine Riesenwelle! Alle auf die Hochhäuser!', floodSafe: 'Puh… wir sind alle in Sicherheit!', lessonTime: 'Mal sehen, was wir gelernt haben!', whale: 'Ein Wal! Hallo!', heat: 'Puh… so heiss und trocken!', storm: 'Was für ein Sturm!', bugs: 'Igitt, Insekten!', warrior: 'Geschafft!',
       choices: [
         ['Zeit für die Schule!', 'Juhu! Am schnellsten!', 'Los geht’s… brumm.', 'Eine Velo-Gruppe!'],
         ['Fernsehen ist vorbei.', 'Klick! Alles aus!', 'Keiner schaut zu…', 'Solarzellen!'],
@@ -376,6 +377,7 @@ const I18N = {
       warming: ['Warme Insel', 'Die Stadt wurde +{n} °C wärmer. Die Sommer sind heisser und es gibt weniger Tiere. Einige grüne Entscheidungen haben geholfen. Versuch es nochmal und kühl sie ab!'],
       hot: ['Heisse Insel', 'Die Stadt wurde +{n} °C heisser. Es ist trocken und stürmisch, überall sind Insekten und die Tiere sind weg. Kleine Entscheidungen zählen. Versuch es nochmal und sieh den Unterschied!'],
       overheated: ['Insel überhitzt!', 'Oh nein! Die Stadt wurde zu heiss (+{n} °C). Es ist trocken und stürmisch, und die Tiere sind weg. Jede grüne Entscheidung hält die Insel kühler. Versuch es nochmal!'],
+      flooded: ['Insel überflutet!', 'Oh nein! Die Stadt wurde zu heiss (+{n} °C). Das warme Meer ist gestiegen, und eine riesige Sturmwelle hat die Stadt weggespült! Bobo, seine Familie und die Nachbarn sind oben auf den Hochhäusern in Sicherheit. Jede grüne Entscheidung hält die Insel kühler. Versuch es nochmal!'],
     },
     ach: {
       first: ['Erste Schritte', 'Beende dein erstes Spiel'],
@@ -611,7 +613,7 @@ const I18N = {
     say: {
       idle: ['Ehi tu! Ci sei ancora?', 'Mi aiuti a scegliere?', 'Psst… cosa è meglio per la nostra città?', 'Aiutami a tenere fresca la città!', 'Ho bisogno del tuo aiuto!', 'Cosa aiuta il nostro pianeta?', 'Pronto? C’è qualcuno?', 'Scegliamo qualcosa di buono per la Terra!'],
       letsGo: 'Andiamo!', schoolOut: 'Scuola finita!', thanksMom: 'Grazie, mamma!', thanksDad: 'Grazie, papà!', thanksBanjo: 'Grazie dell’aiuto, Banjo!',
-      hello: 'Ciao! Sono Bobo!', eclipse: 'Occhiali per l’eclissi!', eclipseWow: 'Wow! Si fa buio!', lessonTime: 'Vediamo cosa abbiamo imparato!', whale: 'Una balena! Ciao!', heat: 'Uff… che caldo secco!', storm: 'Che tempesta!', bugs: 'Bleah, insetti!', warrior: 'Ce l’abbiamo fatta!',
+      hello: 'Ciao! Sono Bobo!', eclipse: 'Occhiali per l’eclissi!', eclipseWow: 'Wow! Si fa buio!', floodWarn: 'Un’onda gigante! Tutti sui grattacieli!', floodSafe: 'Uff… siamo tutti salvi!', lessonTime: 'Vediamo cosa abbiamo imparato!', whale: 'Una balena! Ciao!', heat: 'Uff… che caldo secco!', storm: 'Che tempesta!', bugs: 'Bleah, insetti!', warrior: 'Ce l’abbiamo fatta!',
       choices: [
         ['Si va a scuola!', 'Evviva! Velocissimo!', 'Si parte… brum.', 'Un gruppo in bici!'],
         ['Basta TV.', 'Clic! Tutto spento!', 'Nessuno guarda…', 'Pannelli solari!'],
@@ -646,6 +648,7 @@ const I18N = {
       warming: ['Isola che si scalda', 'La città si è scaldata fino a +{n} °C. Le estati sono più calde e ci sono meno animali. Alcune scelte verdi hanno aiutato. Riprova per rinfrescarla!'],
       hot: ['Isola rovente', 'La città si è scaldata fino a +{n} °C. È secca e tempestosa, ci sono insetti ovunque e gli animali se ne sono andati. Le piccole scelte contano. Riprova e guarda la differenza!'],
       overheated: ['Isola surriscaldata!', 'Oh no! La città è diventata troppo calda (+{n} °C). È secco e tempestoso, e gli animali sono andati via. Ogni scelta verde tiene l’isola più fresca. Riprova!'],
+      flooded: ['Isola allagata!', 'Oh no! La città è diventata troppo calda (+{n} °C). Il mare caldo si è alzato e un’onda gigante di tempesta ha spazzato via la città! Bobo, la sua famiglia e i vicini sono al sicuro in cima ai grattacieli. Ogni scelta verde tiene l’isola più fresca. Riprova!'],
     },
     ach: {
       first: ['Primi passi', 'Finisci la tua prima partita'],
@@ -881,7 +884,7 @@ const I18N = {
     say: {
       idle: ['Hé toi ! Tu es encore là ?', 'Tu peux m’aider à choisir ?', 'Psst… qu’est-ce qui est mieux pour notre ville ?', 'Aide-moi à garder la ville au frais !', 'J’ai besoin de ton aide !', 'Qu’est-ce qui aide notre planète ?', 'Allô ? Il y a quelqu’un ?', 'Choisissons quelque chose de bien pour la Terre !'],
       letsGo: 'C’est parti !', schoolOut: 'Fini l’école !', thanksMom: 'Merci, maman !', thanksDad: 'Merci, papa !', thanksBanjo: 'Merci pour ton aide, Banjo !',
-      hello: 'Salut ! Je suis Bobo !', eclipse: 'Lunettes d’éclipse !', eclipseWow: 'Oh ! Il fait tout noir !', lessonTime: 'Voyons ce qu’on a appris !', whale: 'Une baleine ! Coucou !', heat: 'Pff… si chaud et sec !', storm: 'Quelle tempête !', bugs: 'Beurk, des insectes !', warrior: 'On a réussi !',
+      hello: 'Salut ! Je suis Bobo !', eclipse: 'Lunettes d’éclipse !', eclipseWow: 'Oh ! Il fait tout noir !', floodWarn: 'Une vague géante ! Tout le monde en haut des tours !', floodSafe: 'Ouf… on est tous saufs !', lessonTime: 'Voyons ce qu’on a appris !', whale: 'Une baleine ! Coucou !', heat: 'Pff… si chaud et sec !', storm: 'Quelle tempête !', bugs: 'Beurk, des insectes !', warrior: 'On a réussi !',
       choices: [
         ['C’est l’heure de l’école !', 'Youpi ! Le plus rapide !', 'C’est parti… vroum.', 'Un groupe à vélo !'],
         ['Fini la télé.', 'Clic ! Tout éteint !', 'Personne ne regarde…', 'Des panneaux solaires !'],
@@ -916,6 +919,7 @@ const I18N = {
       warming: ['Île qui chauffe', 'La ville s’est réchauffée jusqu’à +{n} °C. Les étés sont plus chauds et il y a moins d’animaux. Certains choix verts ont aidé. Réessaie pour la rafraîchir !'],
       hot: ['Île brûlante', 'La ville a chauffé jusqu’à +{n} °C. Elle est sèche et pleine de tempêtes, il y a des insectes partout et les animaux sont partis. Les petits choix comptent. Réessaie et vois la différence !'],
       overheated: ['Île en surchauffe !', 'Oh non ! La ville est devenue trop chaude (+{n} °C). C’est sec et orageux, et les animaux sont partis. Chaque choix vert garde l’île plus fraîche. Réessaie !'],
+      flooded: ['Île inondée !', 'Oh non ! La ville est devenue trop chaude (+{n} °C). La mer chaude est montée, et une vague de tempête géante a emporté la ville ! Bobo, sa famille et les voisins sont à l’abri en haut des tours. Chaque choix vert garde l’île plus fraîche. Réessaie !'],
     },
     ach: {
       first: ['Premiers pas', 'Termine ta première partie'],

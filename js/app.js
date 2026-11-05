@@ -574,7 +574,21 @@
   /* ═════════════════════ ENDING ═════════════════════ */
 
   async function finish(early = false) {
-    const ending = early || G.temp >= LOSE_T ? 'overheated' : G.temp <= 1.3 ? 'warrior' : G.temp <= 2.0 ? 'warming' : 'hot';
+    let ending = early || G.temp >= LOSE_T ? 'overheated' : G.temp <= 1.3 ? 'warrior' : G.temp <= 2.0 ? 'warming' : 'hot';
+    // Losing has two endings: the hot, dry island, or (half the games) a giant storm wave that floods the city
+    // while Bobo, his family and the neighbors watch from the tower roofs. The card waits until it's over.
+    if (ending === 'overheated' && Math.random() < 0.5) {
+      ending = 'flooded';
+      const game = G;
+      G.next = null;
+      cardWait();
+      sayLine(() => '');
+      scene.setTime('day');
+      scene.setWeather('storm');
+      await Promise.race([scene.flood(L().say.floodWarn, L().say.floodSafe), wait(16000)]);
+      if (G !== game) return;
+      $('#card').classList.remove('card-wait');
+    }
     if (ending === 'warrior' && !G.sawWhale) {
       // the sea is healthy, so a whale comes to say hello (the card waits so everyone can see it)
       const game = G;
@@ -614,15 +628,17 @@
     if (earned.length) setTimeout(() => Sound.play('achieve'), 900);
     $('#game').classList.add('ending');
     scene.setTime('day');
-    scene.setWeather(ending === 'hot' || ending === 'overheated' ? 'storm' : 'clear');
-    sayLine(() => '');
-    if (ending !== 'warrior') {
+    scene.setWeather(ending === 'hot' || ending === 'overheated' || ending === 'flooded' ? 'storm' : 'clear');
+    if (ending === 'flooded') scene.react('sad', 0);
+    else sayLine(() => '');
+    if (ending === 'warrior') scene.react('yay', 0);
+    else if (ending !== 'flooded') {   // (after the flood everybody stays up on the towers)
       scene.goHome().then(() => {
         if (!G || G.ending !== ending) return;
         scene.react({ warming: 'think', hot: 'hot', overheated: 'hot' }[ending], 0);
         sayLine((sy) => (ending === 'warming' ? '' : sy.heat));
       });
-    } else scene.react('yay', 0);
+    }
     G.next = null;
     G.cardView = endingView;
     endingView();

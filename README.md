@@ -58,6 +58,15 @@ Acceptance Challenges" at the University of St. Gallen (HSG).*
   Earth already is today. If the city reaches +2.5 °C, the island overheats and the game is
   lost right away (a real loss, with Play again). It's meant to be hard: roughly, one bad choice
   is still a Climate Warrior, five or more and the island overheats.
+- Losing has two endings, picked at random: **Island Overheated** (dry, stormy, the animals leave), or
+  **Island Flooded**: Bobo shouts a warning, everyone climbs onto the tower roofs (Bobo and his family
+  on one, the friends and neighbors on the others), and a giant storm wave rises over the city and
+  washes everything away except the towers. (The text says storm wave on purpose: tsunamis come from
+  earthquakes, while rising seas and stronger storms are what a hotter planet brings.)
+- The last screen says that the game exaggerates how much one choice changes the temperature, but
+  that billions of choices together really matter
+- Seagulls fly like real ones: bursts of wingbeats (strong downstroke with the wing spread, quick
+  upstroke with the wing folded) and glides, the body lifting on each beat and sinking while gliding
 - Every game is different: questions come in a random order (getting to school is always first and
   the birthday party comes later on),
   each happens at a fitting time of day (the sun rises on the left and sets on the right), and the
