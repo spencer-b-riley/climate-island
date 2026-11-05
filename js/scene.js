@@ -124,6 +124,7 @@ const Scene = (() => {
       ${[-16, -10, -4, 2, 8, 14].map((x) => `<circle cx="${x}" cy="-1" r="1" fill="#9fd3f3"/>`).join('')}`;
 
   const tree = (x, y, sc = 1) => `<g transform="translate(${x} ${y}) scale(${sc})"><g class="tree">
+      <ellipse cx="3" cy="0" rx="18" ry="4.5" fill="#23313f" opacity=".16"/>
       <path d="M-4 0 L-3 -30 L3 -30 L4 0Z" fill="#9b6a3c"/>
       <g class="crown"><circle cx="0" cy="-44" r="18" class="leaf"/><circle cx="-13" cy="-33" r="12" class="leaf dark"/><circle cx="13" cy="-34" r="13" class="leaf dark"/>
       <circle cx="-6" cy="-50" r="6" fill="#fff" opacity=".2"/></g></g></g>`;
@@ -532,6 +533,7 @@ const Scene = (() => {
   <g data-k="boltsMid"></g>
   <!-- far back: skyscrapers and the power plant -->
   <g class="towers">
+<rect x="282" y="312" width="198" height="5" rx="2.5" fill="#23313f" opacity=".16"/>
     <rect x="286" y="190" width="40" height="124" fill="#8fb3d9"/><rect x="286" y="190" width="40" height="8" fill="#6f93b9"/>
     ${[0, 1, 2, 3, 4, 5, 6, 7].map((r) => `<rect class="win${(r * 3 + 2) % 5 < 2 ? ' unlit' : ''}" x="292" y="${204 + r * 13}" width="10" height="7"/><rect class="win${(r * 3 + 4) % 5 < 2 ? ' unlit' : ''}" x="310" y="${204 + r * 13}" width="10" height="7"/>`).join('')}
     <rect x="332" y="140" width="52" height="174" fill="#f2c94c"/><path d="M332 140 L358 118 L384 140Z" fill="#e0a92f"/><path d="M358 118 V100" stroke="#e0a92f" stroke-width="3"/>
@@ -559,6 +561,7 @@ const Scene = (() => {
       <g data-k="ps4" class="fade hide">${puffs(744, 214, 5, 27, '#555c66', 3.6)}</g>
     </g>
     ${item('plantBurst', 0, 0, puffs(744, 214, 6, 24, '#4b525c', 2.2), 'fade')}
+<rect x="640" y="338" width="124" height="6" rx="3.0" fill="#23313f" opacity=".16"/><rect x="643" y="331" width="118" height="8" rx="2" fill="#c9c2b0"/><path d="M643 331 H761" stroke="#fff" stroke-width="1.5" opacity=".6"/>
     <rect x="650" y="276" width="86" height="58" rx="3" fill="#a9b2bc"/><rect x="650" y="270" width="86" height="8" fill="#8a939d"/>
     <path d="M660 300 h24 v34 h-24Z" fill="#7d8691"/><rect class="win" x="694" y="288" width="12" height="10"/><rect class="win" x="712" y="288" width="12" height="10"/>
     <path d="M734 334 L738 216 L750 216 L754 334Z" fill="#f4f6f8"/><path d="M737 236 h14 M736 260 h16 M735 284 h18" stroke="#e63946" stroke-width="9"/>
@@ -566,7 +569,7 @@ const Scene = (() => {
   </g>
 
   <g class="station closed">
-    <rect x="188" y="321" width="90" height="9" fill="#c9c2b0"/><path d="M188 321 H278" stroke="#fff" stroke-width="2" opacity=".6"/>
+<rect x="186" y="329" width="94" height="5" rx="2.5" fill="#23313f" opacity=".16"/><rect x="188" y="321" width="90" height="9" fill="#c9c2b0"/><path d="M188 321 H278" stroke="#fff" stroke-width="2" opacity=".6"/>
     <path d="M196 321 V292 M270 321 V292" stroke="#6b5a4a" stroke-width="3"/><path d="M182 292 H284 L278 284 H188Z" fill="#e63946"/>
     <rect x="220" y="294" width="26" height="9" rx="2" fill="#2f80ed"/><path d="M226 300 h14" stroke="#fff" stroke-width="2"/>
   </g>
@@ -595,7 +598,7 @@ const Scene = (() => {
       <g transform="translate(0 -18)" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"><path d="M-7 5 A8 8 0 0 1 -5 -7"/><path d="M5 -7 A8 8 0 0 1 8 4"/><path d="M4 8 A8 8 0 0 1 -7 7"/></g>
       <rect x="-22" y="-7" width="11" height="7" fill="#2f80ed"/><rect x="-6" y="-7" width="11" height="7" fill="#ffd23f"/><rect x="10" y="-7" width="11" height="7" fill="#9aa5b1"/>`)}
   <g class="school closed">
-    <rect x="40" y="312" width="136" height="50" fill="#ffcf5a"/><rect x="36" y="306" width="144" height="7" rx="2" fill="#c98f4f"/>
+<rect x="36" y="361" width="144" height="5" rx="2.5" fill="#23313f" opacity=".16"/><rect x="40" y="312" width="136" height="50" fill="#ffcf5a"/><rect x="36" y="306" width="144" height="7" rx="2" fill="#c98f4f"/>
     <path d="M90 306 V290 L108 276 L126 290 V306Z" fill="#ffcf5a" stroke="#c98f4f" stroke-width="3"/><circle cx="108" cy="292" r="7" fill="#fff" stroke="#23313f" stroke-width="1.5"/>
     <path data-k="clockH" class="clock-hand" d="M108 292 V288.6" stroke="#23313f" stroke-width="1.6" stroke-linecap="round"/><path data-k="clockM" class="clock-hand" d="M108 292 V286.6" stroke="#23313f" stroke-width="1.1" stroke-linecap="round"/><circle cx="108" cy="292" r="1" fill="#23313f"/>
     ${[50, 70, 136, 156].map((x) => `<rect class="win" x="${x}" y="320" width="13" height="12" rx="1"/><rect class="win" x="${x}" y="337" width="13" height="11" rx="1"/>`).join('')}
@@ -606,7 +609,7 @@ const Scene = (() => {
     ${item('swapBox', 74, 362, `<rect x="-12" y="-14" width="24" height="14" rx="2" fill="#c98f4f" stroke="#8b5a2b" stroke-width="1.5"/><circle cx="-5" cy="-17" r="4" fill="#ff5b4a"/><rect x="0" y="-22" width="8" height="8" fill="#2f80ed"/><path d="M-9 -7 h18" stroke="#fff" stroke-width="2"/>`)}
   </g>
   <g class="thrift closed">
-    <rect x="424" y="324" width="76" height="38" fill="#b388ff"/><rect x="420" y="308" width="84" height="15" rx="3" fill="#7e57c2"/>
+<rect x="420" y="361" width="84" height="5" rx="2.5" fill="#23313f" opacity=".16"/><rect x="424" y="324" width="76" height="38" fill="#b388ff"/><rect x="420" y="308" width="84" height="15" rx="3" fill="#7e57c2"/>
     <path d="M454 320 q8 -9 16 0 M462 311 v4" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M450 320 h24" stroke="#fff" stroke-width="2.2"/>
     ${[0, 1, 2, 3, 4, 5, 6].map((k) => `<path d="M${422 + k * 12} 323 h12 v6 q-6 5 -12 0Z" fill="${k % 2 ? '#fff' : '#ff6fa8'}"/>`).join('')}
     <rect class="win" x="430" y="336" width="20" height="18" rx="2"/><path d="M434 340 l3 -2 h6 l3 2 l-2 3 v8 h-8 v-8Z" fill="#2fb35a"/>
@@ -614,7 +617,7 @@ const Scene = (() => {
     ${item('clothesRack', 505, 362, `<path d="M-14 0 V-24 H14 V0" stroke="#6b5a4a" stroke-width="2" fill="none"/><path d="M-11 -24 l-2 4 v12 h8 v-12 l-2 -4Z" fill="#ff6fa8"/><path d="M-1 -24 l-2 4 v12 h8 v-12 l-2 -4Z" fill="#ffd23f"/><path d="M8 -24 l-2 4 v12 h7 v-12 l-2 -4Z" fill="#2f80ed"/>`)}
   </g>
   <g class="mall closed">
-    <rect x="514" y="300" width="120" height="62" fill="#8fb3d9"/><rect x="510" y="294" width="128" height="8" rx="2" fill="#6f93b9"/>
+<rect x="510" y="361" width="128" height="5" rx="2.5" fill="#23313f" opacity=".16"/><rect x="514" y="300" width="120" height="62" fill="#8fb3d9"/><rect x="510" y="294" width="128" height="8" rx="2" fill="#6f93b9"/>
     <rect x="548" y="304" width="52" height="15" rx="4" fill="#ff5b4a"/><path d="M566 309 h16 l-2 8 h-12Z M569 309 q5 -7 10 0" fill="none" stroke="#fff" stroke-width="2"/>
     ${[520, 538, 600, 618].map((x) => `<rect class="win" x="${x}" y="324" width="12" height="14" rx="1"/>`).join('')}
     <rect x="560" y="330" width="28" height="32" fill="#cfefff" stroke="#6f93b9" stroke-width="2"/><path d="M574 330 V362" stroke="#6f93b9" stroke-width="2"/>
@@ -658,17 +661,17 @@ const Scene = (() => {
   ${item('parkedCar', 434, 422, `<g transform="scale(.94)">${carRear('#e63946')}</g>`, 'fade', false)}
   <!-- a second friend's house, on the far left -->
   <g class="friend-house">
-    <rect x="30" y="392" width="64" height="34" fill="#bde3a0"/><path d="M22 394 L62 362 L102 394Z" fill="#3fa08f"/>
+<rect x="26" y="425" width="72" height="5" rx="2.5" fill="#23313f" opacity=".16"/><rect x="30" y="392" width="64" height="34" fill="#bde3a0"/><path d="M22 394 L62 362 L102 394Z" fill="#3fa08f"/>
     <rect class="win" x="37" y="401" width="15" height="12" rx="1"/><rect class="win" x="74" y="401" width="14" height="12" rx="1"/><rect x="56" y="404" width="12" height="22" fill="#8b5a2b"/>
   </g>
   <g class="friend-house">
-    <rect x="132" y="388" width="68" height="38" fill="#ffb3c7"/><path d="M124 390 L166 356 L208 390Z" fill="#c94f6d"/>
+<rect x="128" y="425" width="76" height="5" rx="2.5" fill="#23313f" opacity=".16"/><rect x="132" y="388" width="68" height="38" fill="#ffb3c7"/><path d="M124 390 L166 356 L208 390Z" fill="#c94f6d"/>
     <rect class="win" x="139" y="398" width="16" height="13" rx="1"/><rect class="win" x="178" y="398" width="15" height="13" rx="1"/><rect x="160" y="402" width="13" height="24" fill="#8b5a2b"/>
     ${item('solarHeater', 172, 371, `<g transform="rotate(39)"><rect x="-4" y="-6" width="22" height="9" rx="1" fill="#2f5d9e" stroke="#9cc3ff"/><rect x="2" y="-13" width="12" height="7" rx="3" fill="#dfe5ea"/></g>`)}
   </g>
   ${lamp(212, 432, true)}
   <g data-k="boboHouse" class="bobo-house">
-    <rect x="290" y="374" width="120" height="52" fill="#7fd3f7"/><path d="M290 374 H410" stroke="#5fb3d7" stroke-width="3"/>
+<rect x="286" y="425" width="128" height="5" rx="2.5" fill="#23313f" opacity=".16"/><rect x="290" y="374" width="120" height="52" fill="#7fd3f7"/><path d="M290 374 H410" stroke="#5fb3d7" stroke-width="3"/>
     <rect x="386" y="340" width="13" height="26" fill="#c0392b"/>
     <path d="M280 377 L350 334 L420 377Z" fill="#ff8c42"/><path d="M280 377 L350 334 L420 377" stroke="#e06b28" stroke-width="3" fill="none"/>
     ${item('houseSmoke', 0, 0, puffs(392, 334, 4, 9, '#8a8f98', 4), 'fade')}
