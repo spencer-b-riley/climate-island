@@ -695,6 +695,7 @@
     card(`
       <h2 style="margin:0">${t('takeTitle')} ${Icon('globe')}</h2>
       <ul class="takeaways">${L().takeaways.map((tk, k) => `<li><span>${Icon(TAKEAWAY_ICONS[k])}</span>${esc(tk)}</li>`).join('')}</ul>
+      <p class="note">${Icon('globe')} ${t('realNote')}</p>
       <div class="row">
         <button class="btn primary" data-action="playAgain">${Icon('replay')} ${t('playAgain')}</button>
         <button class="btn ghost" data-action="menu">${Icon('home')} ${t('menu')}</button>
